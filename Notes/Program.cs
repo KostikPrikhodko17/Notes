@@ -28,14 +28,13 @@ namespace Notes
 
             do
             {
-                Console.WriteLine("\n1 - Создать заметку\n\n2 - Посмотреть заметки\n\n3 - Сохранить и выйти");
+                Console.WriteLine("\n1 - Создать заметку\n\n2 - Посмотреть заметки\n\n3 - Редактировать заметку\n\n4 - Сохранить и выйти");
                 string input = Console.ReadLine();
 
                 switch (input)
                 {
                     case "1":
                         CreateNote(notes);
-                        Console.WriteLine("\n\n");
                         break;
 
                     case "2":
@@ -44,11 +43,25 @@ namespace Notes
                             NotesIsEmpty();
                             break;
                         }
-                        DisplayNoteContent(notes);
-                        Console.WriteLine("\n\n");
+
+                        DisplayListNotes(notes);
+                        modelNote = GetNote(notes);
+
+                        if (modelNote == null)
+                            break;
+                        
+                        DisplayContentNote(modelNote);
                         break;
 
                     case "3":
+                        DisplayListNotes(notes);
+                        modelNote = GetNote(notes);
+                        if (modelNote == null)
+                            break;
+                        EditNote(modelNote);
+                        break;
+
+                    case "4":
                         SaveToData(notes);
                         isRunning = false;
                         break;
@@ -70,13 +83,11 @@ namespace Notes
 
         static void CreateNote(List<ModelNote> notes)
         {
-            string message = "Введите заголовок заметки: ";
-            string title = GetNoteTitleOrContent(message);
+            string title = GetNoteTitleOrContent("\nВернуться в меню - x\nВведите заголовок заметки: ");
             if (title == null)
                 return;
 
-            message = "Ваша заметка ...";
-            string content = GetNoteTitleOrContent(message);
+            string content = GetNoteTitleOrContent("\nВернуться в меню - x\nВаша заметка ...");
             if (content == null)
                 return;
 
@@ -94,7 +105,7 @@ namespace Notes
         {
             while (true)
             {
-                Console.WriteLine($"\n\nВернуться в меню - x\n{message}\n");
+                Console.WriteLine(message);
                 string input = Console.ReadLine();
 
                 if (input.ToLower() != "x" && !string.IsNullOrWhiteSpace(input))
@@ -112,7 +123,7 @@ namespace Notes
             }
         }
 
-        static void ShowListNotes(List<ModelNote> notes) 
+        static void DisplayListNotes(List<ModelNote> notes) 
         {
             Console.WriteLine("\n");
             Console.WriteLine($"{"ID", -5} {"Заголовок", -30} {"Дата", -30}");
@@ -122,13 +133,17 @@ namespace Notes
                 Console.WriteLine($"\n{note.Id, -5} {note.Title, -30} {note.Date.ToString("dd.MM.yyyy"), -30}");
             }
         }
-
-        static ModelNote GetNote(List<ModelNote> notes)
+        static void DisplayContentNote(ModelNote note)
+        {
+            Console.WriteLine(new string('-', 70) + "\n");
+            Console.WriteLine($"Заголовок \n{note.Title}\n");
+            Console.WriteLine($"Содержимое \n{note.Content}");
+            Console.WriteLine("\n" + new string('-', 70) + "\n");
+        }
+        static ModelNote GetNote(List<ModelNote> notes) 
         {
             while (true)
             {
-                ShowListNotes(notes);
-
                 Console.WriteLine("\n\nВернуться в меню - x\nВведите ID заметки\n");
                 string input = Console.ReadLine();
 
@@ -157,20 +172,21 @@ namespace Notes
 
         }
 
-        static void DisplayNoteContent(List<ModelNote> notes)
+        static void EditNote(ModelNote note)
         {
-            ModelNote note = GetNote(notes);
+            DisplayContentNote(note);
+            Console.WriteLine("\n1 - Редактировать заголовок\n2 - Редактировать содержимое\n");
+            string input = Console.ReadLine();
 
-            if (note == null)
-                return;
+            if (input == "1")
+                note.Title = GetNoteTitleOrContent("\nНе редактировать - x\nРедактируйте заголовок заметки: ") ?? note.Title;
+            else if (input == "2")
+                note.Content = GetNoteTitleOrContent("\nНе редактировать = x\nРедактируйте содержимое заметки: ") ?? note.Content;
+            else
+                Console.WriteLine("\nНекоректный ввод!");
 
-            Console.WriteLine(new string('-', 70) + "\n");
-            Console.WriteLine($"\t\t\t{note.Title}\n");
-            Console.WriteLine(note.Content);
-            Console.WriteLine("\n" + new string('-', 70) + "\n");
+
         }
-
-
 
         static void SaveToData(List<ModelNote> notes)
         {
