@@ -28,13 +28,14 @@ namespace Notes
 
             do
             {
-                Console.WriteLine("\n1 - Создать заметку\n\n2 -Просмотреть список заметок\n\n3 - Посмотреть содержимое заметки\n\n4 - Сохранить и выйти");
+                Console.WriteLine("\n1 - Создать заметку\n\n2 - Посмотреть заметки\n\n3 - Сохранить и выйти");
                 string input = Console.ReadLine();
 
                 switch (input)
                 {
                     case "1":
                         CreateNote(notes);
+                        Console.WriteLine("\n\n");
                         break;
 
                     case "2":
@@ -43,19 +44,11 @@ namespace Notes
                             NotesIsEmpty();
                             break;
                         }
-                        ShowListNotes(notes);
+                        DisplayNoteContent(notes);
+                        Console.WriteLine("\n\n");
                         break;
 
                     case "3":
-                        if (!notes.Any())
-                        {
-                            NotesIsEmpty();
-                            break;
-                        }
-                        DisplayNoteContent(notes);
-                        break;
-
-                    case "4":
                         SaveToData(notes);
                         isRunning = false;
                         break;
@@ -101,7 +94,7 @@ namespace Notes
         {
             while (true)
             {
-                Console.WriteLine($"\nВернуться в меню - x\n{message}\n");
+                Console.WriteLine($"\n\nВернуться в меню - x\n{message}\n");
                 string input = Console.ReadLine();
 
                 if (input.ToLower() != "x" && !string.IsNullOrWhiteSpace(input))
@@ -121,42 +114,60 @@ namespace Notes
 
         static void ShowListNotes(List<ModelNote> notes) 
         {
-            Console.WriteLine($"{"ID", -5} {"Заголовок", -20} {"Дата", -30}");
+            Console.WriteLine("\n");
+            Console.WriteLine($"{"ID", -5} {"Заголовок", -30} {"Дата", -30}");
             Console.WriteLine(new string('-', 70));
             foreach (var note in notes)
             {
-                Console.WriteLine($"\n{note.Id, -5} {note.Title, -20} {note.Date.ToString("dd.MM.yyyy"), -30}");
+                Console.WriteLine($"\n{note.Id, -5} {note.Title, -30} {note.Date.ToString("dd.MM.yyyy"), -30}");
             }
+        }
+
+        static ModelNote GetNote(List<ModelNote> notes)
+        {
+            while (true)
+            {
+                ShowListNotes(notes);
+
+                Console.WriteLine("\n\nВернуться в меню - x\nВведите ID заметки\n");
+                string input = Console.ReadLine();
+
+                if (int.TryParse(input, out int noteId))
+                {
+                    var note = notes.FirstOrDefault(n => n.Id == noteId);
+
+                    if (note != null)
+                    {
+                        return note;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nЗаметка с таким ID не найдена!");
+                    }
+                }
+                else if (input.ToLower() == "x")
+                {
+                    return null;
+                }
+                else
+                {
+                    Console.WriteLine("Некоректные данные");
+                }
+            }
+
         }
 
         static void DisplayNoteContent(List<ModelNote> notes)
         {
-            ShowListNotes(notes);
+            ModelNote note = GetNote(notes);
 
-            Console.WriteLine("\nВернуться в меню - x\nВведите ID заметки\n");
-            string input = Console.ReadLine();
-
-            if (int.TryParse(input, out int noteId))
-            {
-                var note = notes.FirstOrDefault(n => n.Id == noteId);
-
-                if (note != null)
-                {
-                    Console.WriteLine($"\n{note.Title}\n{note.Content}");
-                }
-                else
-                {
-                    Console.WriteLine("\nЗаметка с таким ID не найдена!");
-                }
-            }
-            else if (input.ToLower() == "x")
-            {
+            if (note == null)
                 return;
-            }
-            else
-            {
-                Console.WriteLine("\nНекоректный ввод!");
-            }
+
+            Console.WriteLine(new string('-', 70) + "\n");
+            Console.WriteLine($"\t\t\t{note.Title}\n");
+            Console.WriteLine(note.Content);
+            Console.WriteLine("\n" + new string('-', 70) + "\n");
         }
 
 
