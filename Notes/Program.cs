@@ -28,7 +28,7 @@ namespace Notes
 
             do
             {
-                Console.WriteLine("\n1 - Создать заметку\n\n2 - Посмотреть заметки\n\n3 - Редактировать заметку\n\n4 - Сохранить и выйти");
+                Console.WriteLine("\n1 - Создать заметку\n\n2 - Посмотреть заметки\n\n3 - Редактировать заметку\n\n4 - Удалить заметку\n\n5 - Сохранить и выйти");
                 string input = Console.ReadLine();
 
                 switch (input)
@@ -62,6 +62,14 @@ namespace Notes
                         break;
 
                     case "4":
+                        DisplayListNotes(notes);
+                        modelNote = GetNote(notes);
+                        if (modelNote == null)
+                            break;
+                        DeleteNote(notes, modelNote);
+                        break;
+
+                    case "5":
                         SaveToData(notes);
                         isRunning = false;
                         break;
@@ -175,17 +183,42 @@ namespace Notes
         static void EditNote(ModelNote note)
         {
             DisplayContentNote(note);
-            Console.WriteLine("\n1 - Редактировать заголовок\n2 - Редактировать содержимое\n");
+            Console.WriteLine("\n1 - Редактировать заголовок\n2 - Редактировать содержимое\n3 - Редактировать все\n");
             string input = Console.ReadLine();
 
             if (input == "1")
+            {
                 note.Title = GetNoteTitleOrContent("\nНе редактировать - x\nРедактируйте заголовок заметки: ") ?? note.Title;
+            }
             else if (input == "2")
+            {
                 note.Content = GetNoteTitleOrContent("\nНе редактировать = x\nРедактируйте содержимое заметки: ") ?? note.Content;
+            }
+            else if (input == "3")
+            {
+                note.Title = GetNoteTitleOrContent("\nНе редактировать - x\nРедактируйте заголовок заметки: ") ?? note.Title;
+                note.Content = GetNoteTitleOrContent("\nНе редактировать = x\nРедактируйте содержимое заметки: ") ?? note.Content;
+            }
+            else
+            {
+                Console.WriteLine("\nНекоректный ввод!");
+            }
+
+
+        }
+
+        static void DeleteNote(List<ModelNote> notes, ModelNote note)
+        {
+            DisplayContentNote(note);
+            Console.WriteLine("\nОтменить удаление - x\n1 - Удалить заметку");
+            string input = Console.ReadLine();
+
+            if (input.ToLower() == "x")
+                return;
+            else if (input == "1")
+                notes.Remove(note);
             else
                 Console.WriteLine("\nНекоректный ввод!");
-
-
         }
 
         static void SaveToData(List<ModelNote> notes)
