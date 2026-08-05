@@ -28,7 +28,7 @@ namespace Notes
 
             do
             {
-                Console.WriteLine("\n1 - Создать заметку\n\n2 - Посмотреть заметки\n\n3 - Редактировать заметку\n\n4 - Удалить заметку\n\n5 - Сохранить и выйти");
+                Console.WriteLine("\n1 - Создать заметку\n\n2 - Посмотреть заметки\n\n3 - Редактировать заметку\n\n4 - Найти заметку\n\n5 - Удалить заметку\n\n6 - Сохранить и выйти");
                 string input = Console.ReadLine();
 
                 switch (input)
@@ -45,7 +45,7 @@ namespace Notes
                         }
 
                         DisplayListNotes(notes);
-                        modelNote = GetNote(notes);
+                        modelNote = GetNoteOnID(notes);
 
                         if (modelNote == null)
                             break;
@@ -55,21 +55,25 @@ namespace Notes
 
                     case "3":
                         DisplayListNotes(notes);
-                        modelNote = GetNote(notes);
+                        modelNote = GetNoteOnID(notes);
                         if (modelNote == null)
                             break;
                         EditNote(modelNote);
                         break;
 
                     case "4":
+                        SearchNote(notes);
+                        break;
+
+                    case "5":
                         DisplayListNotes(notes);
-                        modelNote = GetNote(notes);
+                        modelNote = GetNoteOnID(notes);
                         if (modelNote == null)
                             break;
                         DeleteNote(notes, modelNote);
                         break;
 
-                    case "5":
+                    case "6":
                         SaveToData(notes);
                         isRunning = false;
                         break;
@@ -148,7 +152,7 @@ namespace Notes
             Console.WriteLine($"Содержимое \n{note.Content}");
             Console.WriteLine("\n" + new string('-', 70) + "\n");
         }
-        static ModelNote GetNote(List<ModelNote> notes) 
+        static ModelNote GetNoteOnID(List<ModelNote> notes) 
         {
             while (true)
             {
@@ -219,6 +223,52 @@ namespace Notes
                 notes.Remove(note);
             else
                 Console.WriteLine("\nНекоректный ввод!");
+        }
+
+        static void SearchNote(List<ModelNote> notes)
+        {
+            Console.WriteLine("\nВведите название...\n");
+            string input = Console.ReadLine();
+
+            List<ModelNote> foundNotes = new List<ModelNote>();
+            foundNotes = notes.Where(n => n.Title.Contains(input, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (foundNotes.Any())
+            {
+                FoundNotes(foundNotes);
+
+            }
+            else
+            {
+                Console.WriteLine("Заметки не найдены");
+            }
+        }
+
+        static void FoundNotes(List<ModelNote> foundNotes)
+        {
+            DisplayListNotes(foundNotes);
+            Console.Write("Выбирете заметку: ");
+            ModelNote note = GetNoteOnID(foundNotes);
+
+            Console.WriteLine("\n1 - Просмотреть заметку\n2 - Редактировать заметку\n3 - Удалить заметку\n");
+            string input = Console.ReadLine();
+
+            if (input == "1")
+            {
+                DisplayContentNote(note);
+            }
+            else if (input == "2")
+            {
+                EditNote(note);
+            }
+            else if (input == "3")
+            {
+                DeleteNote(foundNotes, note);
+            }
+            else
+            {
+                Console.WriteLine("Некоректные данные");
+            }
         }
 
         static void SaveToData(List<ModelNote> notes)
