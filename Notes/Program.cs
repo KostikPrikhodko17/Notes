@@ -193,15 +193,18 @@ namespace Notes
             if (input == "1")
             {
                 note.Title = GetNoteTitleOrContent("\nНе редактировать - x\nРедактируйте заголовок заметки: ") ?? note.Title;
+                note.Date = DateTime.Now;
             }
             else if (input == "2")
             {
                 note.Content = GetNoteTitleOrContent("\nНе редактировать = x\nРедактируйте содержимое заметки: ") ?? note.Content;
+                note.Date = DateTime.Now;
             }
             else if (input == "3")
             {
                 note.Title = GetNoteTitleOrContent("\nНе редактировать - x\nРедактируйте заголовок заметки: ") ?? note.Title;
                 note.Content = GetNoteTitleOrContent("\nНе редактировать = x\nРедактируйте содержимое заметки: ") ?? note.Content;
+                note.Date = DateTime.Now;
             }
             else
             {
